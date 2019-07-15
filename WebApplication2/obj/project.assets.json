@@ -11803,11 +11803,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/nikolaevs/Downloads/WebApplication2/WebApplication2/WebApplication2.csproj",
+      "projectUniqueName": "/Users/nikolaevs/Downloads/WebApplication2/My_project/WebApplication2/WebApplication2.csproj",
       "projectName": "WebApplication2",
-      "projectPath": "/Users/nikolaevs/Downloads/WebApplication2/WebApplication2/WebApplication2.csproj",
+      "projectPath": "/Users/nikolaevs/Downloads/WebApplication2/My_project/WebApplication2/WebApplication2.csproj",
       "packagesPath": "/Users/nikolaevs/.nuget/packages/",
-      "outputPath": "/Users/nikolaevs/Downloads/WebApplication2/WebApplication2/obj/",
+      "outputPath": "/Users/nikolaevs/Downloads/WebApplication2/My_project/WebApplication2/obj/",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
