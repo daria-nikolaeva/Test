@@ -96,16 +96,7 @@ namespace WebApplication2.Controllers
                 return NotFound();
             }
 
-           /* User tmp = userStorage.Find(id);
-            if (tmp == null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                userStorage.RemoveUser(id);
-                return Ok();
-            }*/
+           
 
            
         }
