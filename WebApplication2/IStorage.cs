@@ -42,7 +42,7 @@ namespace WebApplication2
             return user;
         }
 
-        public bool RemoveUser(int id)//переделать что-бы возвращало бул
+        public bool RemoveUser(int id)
         {
            
             User user;
