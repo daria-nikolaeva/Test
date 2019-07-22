@@ -13,9 +13,10 @@ namespace WebApplication2
 
         void AddUser(User user);
         IEnumerable<User> GetAll();
-        User Find(int id);
-        bool RemoveUser(int id);
-        void Update(User user);
+        User FindUser(int id);
+        void RemoveUser(int id);
+        void UpdateUser(User user);
+        bool ContainsUser(int id);
 
     }
 
@@ -35,21 +36,28 @@ namespace WebApplication2
             return instance.Values.ToList();
         }
 
-        public User Find(int id)
+        public User FindUser(int id)
         {
             User user;
             instance.TryGetValue(id, out user);
             return user;
         }
 
-        public bool RemoveUser(int id)
+        public void RemoveUser(int id)
         {
-           
             User user;
-            int curentSize = instance.Count();
-            instance.TryRemove(id,out user);
-            int newSize= instance.Count();
-            if (curentSize > newSize)
+            instance.Remove(id, out user);
+
+        }
+
+        public void UpdateUser(User user)
+        {
+            instance[user.Id] = user;
+        }
+
+        public bool ContainsUser(int id)
+        {
+            if (instance.ContainsKey(id))
             {
                 return true;
             }
@@ -57,13 +65,6 @@ namespace WebApplication2
             {
                 return false;
             }
-
-
-        }
-
-        public void Update(User user)
-        {
-            instance[user.Id] = user;
         }
 
     }
@@ -72,69 +73,87 @@ namespace WebApplication2
     class UserStorageB : IUserStorage
     {
 
-        private static ConcurrentBag<KeyValuePair<int, User>> instance = new ConcurrentBag<KeyValuePair<int, User>>();
+        private static readonly ConcurrentBag<KeyValuePair<int, User>> instance = new ConcurrentBag<KeyValuePair<int, User>>();
 
         public void AddUser(User user)
         {
+            if(instance.All(u=>u.Key!=user.Id))
             instance.Add(new KeyValuePair<int, User>(user.Id, user));
 
         }
 
         public IEnumerable<User> GetAll()
         {
-            var users = new List<User>();
-            var temp = instance.ToList();
-            temp.ForEach(x => users.Add(x.Value));
-            return users;
+           
+            foreach (var variable in instance.Where(u => u.Value != null).ToList())
+            {
+                yield return variable.Value;
+            }
+            
+              
         }
 
-        public User Find(int id)
+        public User FindUser(int id)
         {
             
-            var SelectedUser = instance.SingleOrDefault(u=>u.Key==id);
+            var SelectedUser =  instance.SingleOrDefault(u => u.Key == id);
             return SelectedUser.Value;
         }
 
-        public bool RemoveUser(int id)
+        public void RemoveUser(int id)
         {
-            bool result;
-            ConcurrentBag<KeyValuePair<int, User>> newBag = new ConcurrentBag<KeyValuePair<int, User>>();
-            var newUserList = new List<KeyValuePair<int, User>>();
-            var currentBag = instance.ToList();
-
-            newUserList = currentBag.Where(x => x.Key != id).ToList();
-
-            newUserList.ForEach(x => newBag.Add(x));
-
-            if (instance.Count() > newBag.Count())
+            KeyValuePair<int, User> kvp;
+            var tempList = new List<KeyValuePair<int, User>>();
+            while (!instance.IsEmpty)
             {
-                result = true;
-                instance = newBag;
-            }
-            else
-            {
-                result = false;
+                instance.TryTake(out kvp);
+                if (kvp.Key == id)
+                {
+                    tempList.ForEach(x => instance.Add(x));
+                    break;
+                }
+                else
+                {
+                    tempList.Add(kvp);
+                }
             }
 
-            return result;
+
+            
         }
 
 
-        public void Update(User user)
+        public void UpdateUser(User user)
         {
+            IEnumerator<KeyValuePair<int, User>> it = instance.GetEnumerator();
+            foreach (var variable in instance)
+            {
+                if (variable.Key == user.Id)
+                {
+                    variable.Value.Name=user.Name;
+                }
+                else
+                {
+                    it.MoveNext();
+                }
 
-            ConcurrentBag<KeyValuePair<int, User>> newBag = new ConcurrentBag<KeyValuePair<int, User>>();
-            var newUserList = new List<KeyValuePair<int, User>>();
-            var currentBag = instance.ToList();
-
-            newUserList = currentBag.Where(x => x.Key != user.Id).ToList();
-
-            newUserList.ForEach(x => newBag.Add(x));
-
+            }
             
-            instance = newBag;
-            instance.Add(new KeyValuePair<int, User>(user.Id, user));
-            
+
+
+        }
+
+        public bool ContainsUser(int id)
+        {
+           
+            if (instance.Any(u => u.Key == id))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 

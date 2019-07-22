@@ -32,9 +32,10 @@ namespace WebApplication2.Controllers
         [HttpGet("{id}")]
         public ActionResult<User> GetbyId(int id)
         {
-            //User user;
-            User tmp = userStorage.Find(id);
-            if (tmp == null)
+           
+            User tmp = userStorage.FindUser(id);
+           
+            if (!userStorage.ContainsUser(id))
             {
                return NotFound();
             }
@@ -49,8 +50,8 @@ namespace WebApplication2.Controllers
         [HttpPost]
         public ActionResult Post([FromBody] User user)
         {
-            User tmp = userStorage.Find(user.Id);
-            if (tmp != null)
+            
+            if (userStorage.ContainsUser(user.Id))
             {
                 return BadRequest();
             }
@@ -66,18 +67,18 @@ namespace WebApplication2.Controllers
         [HttpPut("{id}")]
         public ActionResult Put(int id, [FromBody] string value)
         {
-            
 
-            User tmp = userStorage.Find(id);
-            if (tmp != null)
+          
+           
+            if (userStorage.ContainsUser(id)&&userStorage.FindUser(id).Name!=value)
             {
                 User user = new User(id, value);
-                userStorage.Update(user);
+                userStorage.UpdateUser(user);
                 return Ok();
             }
             else
             {
-                return NotFound();
+                return BadRequest();
             }
           
         }
@@ -87,8 +88,9 @@ namespace WebApplication2.Controllers
         public ActionResult Delete(int id)
         {
 
-            if (userStorage.RemoveUser(id))
+            if (userStorage.ContainsUser(id))
             {
+                userStorage.RemoveUser(id);
                 return Ok();
             }
             else
